@@ -19,9 +19,9 @@ func editPlayer(storyId: String, player: Player) {
     )
     postJSON(to: "https://4vvhnxuymf.execute-api.us-east-2.amazonaws.com/editplayer", object: editPlayerBody) { (result: Result<Story, Error>) in
         switch result {
-        case .success(let story):
+        case .success(_):
             print("player good")
-        case .failure(let story):
+        case .failure(_):
             print("player bad")
         }
     }

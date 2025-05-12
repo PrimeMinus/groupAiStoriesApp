@@ -147,6 +147,7 @@ func chunked<T>(_ array: [T], into size: Int) -> [[T]] {
 
     let mockAppData = AppData()
     mockAppData.currentStory = previewStory
+    mockAppData.isHost = true
 
     return LobbyView()
         .environmentObject(mockAppData)

@@ -23,9 +23,13 @@ struct ContentView: View {
                     showWelcomeScreen = false
                 }
             }
+        // if user is in a story
         } else if appData.currentStory.id != "" || true {
+            // if story has content
             if appData.currentStory.content.count > 0 {
-                
+                if appData.currentStory.content[0] == "loading" {
+                    
+                }
             } else {
                 LobbyView()
             }
