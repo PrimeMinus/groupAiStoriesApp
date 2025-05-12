@@ -8,14 +8,30 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    @EnvironmentObject var appData: AppData
+    @State private var showWelcomeScreen: Bool = true
+    @AppStorage("defaultPlayerName") var defaultPlayerName: String = ""
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        if showWelcomeScreen {
+            WelcomeView(buttonAction: {
+                showWelcomeScreen = false
+            })
+            .task {
+                if defaultPlayerName != "" {
+                    showWelcomeScreen = false
+                }
+            }
+        } else if appData.currentStory.id != "" || true {
+            if appData.currentStory.content.count > 0 {
+                
+            } else {
+                LobbyView()
+            }
+        } else {
+            HomeView()
         }
-        .padding()
     }
 }
 
