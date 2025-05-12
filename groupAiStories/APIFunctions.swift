@@ -1,11 +1,76 @@
 //
-//  Functions.swift
+//  APIFunctions.swift
 //  groupAiStories
 //
 //  Created by Brian Warner on 5/11/25.
 //
 
 import Foundation
+
+//MARK: - /EDITPLAYER
+struct editPlayerBody: Codable {
+    var storyId: String
+    var player: Player
+}
+func editPlayer(storyId: String, player: Player) {
+    let editPlayerBody: editPlayerBody = editPlayerBody(
+        storyId: storyId,
+        player: player
+    )
+    postJSON(to: "https://4vvhnxuymf.execute-api.us-east-2.amazonaws.com/editplayer", object: editPlayerBody) { (result: Result<Story, Error>) in
+        switch result {
+        case .success(let story):
+            print("player good")
+        case .failure(let story):
+            print("player bad")
+        }
+    }
+}
+
+
+//MARK: - /EDITSTORY
+struct editStoryBody: Codable {
+    var id: String
+    var title: String
+    var setting: String
+    var theme: String
+    var instructions: String
+    var winners: Int
+}
+func editStory(story: Story) {
+    let editStoryBody: editStoryBody = editStoryBody(
+        id: story.id,
+        title: story.title,
+        setting: story.setting,
+        theme: story.theme,
+        instructions: story.instructions,
+        winners: story.winners
+    )
+    postJSON(to: "https://4vvhnxuymf.execute-api.us-east-2.amazonaws.com/editstory", object: editStoryBody) { (result: Result<Story, Error>) in
+        switch result {
+        case .success(let story):
+            print("Story fetched: \(story.title)")
+        case .failure(let error):
+            print("Failed to fetch story: \(error.localizedDescription)")
+        }
+    }
+}
+
+
+//MARK: - /CREATESTORY
+struct createStoryBody: Codable {
+    var id: String
+}
+func generateStory(id: String) {
+    postJSON(to: "https://4vvhnxuymf.execute-api.us-east-2.amazonaws.com/createstory", object: createStoryBody(id: id)) { (result: Result<Story, Error>) in
+        switch result {
+        case .success(let story):
+            print("Story fetched: \(story.title)")
+        case .failure(let error):
+            print("Failed to fetch story: \(error.localizedDescription)")
+        }
+    }
+}
 
 //MARK: - /READSTORY
 struct readStoryBody: Codable {
