@@ -19,7 +19,7 @@ struct Story: Codable {
     var content: [String]
 }
 
-struct Player: Codable {
+struct Player: Identifiable, Codable, Hashable {
     var id: String
     var name: String
     var characteristics: String

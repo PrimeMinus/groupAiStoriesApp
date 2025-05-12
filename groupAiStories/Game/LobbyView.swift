@@ -51,10 +51,45 @@ struct LobbyView: View {
                     Text("Players")
                         .bold()
                         .font(.title)
-                    ForEach(appData.currentStory.players, id: \.id) { player in
-                        Text(player.name)
-                        Text(player.characteristics)
-                        
+                    LazyVStack(alignment: .leading) {
+                        ForEach(chunked(appData.currentStory.players, into: 2), id: \.self) { pair in
+                            HStack {
+                                ForEach(pair) { player in
+                                    Button(action: {
+                                        print(true)
+                                    }, label: {
+                                        VStack {
+                                            HStack {
+                                                VStack {
+                                                    Text(player.name)
+                                                    Text(player.characteristics)
+                                                }
+                                                .padding(.leading, 5)
+                                                Spacer()
+                                                VStack {
+                                                    Spacer()
+                                                    Image(systemName: "pencil.circle")
+                                                    Spacer()
+                                                }
+                                                .padding(.trailing, 5)
+                                            }
+                                            .background(Color.accentColor)
+                                            .clipShape(
+                                                .rect(
+                                                    topLeadingRadius: 15,
+                                                    bottomLeadingRadius: 15,
+                                                    bottomTrailingRadius: 15,
+                                                    topTrailingRadius: 15
+                                                )
+                                            )
+                                        }
+                                        .foregroundStyle(Color.white)
+                                        .padding(.leading, 5)
+                                        .padding(.trailing, 5)
+                                    })
+                                }
+                            }
+                        }
                     }
                 }
                 .padding()
@@ -82,6 +117,13 @@ struct LobbyView: View {
                 timerSubscription = nil
             }
         }
+    }
+}
+
+// Helper function to split array into chunks
+func chunked<T>(_ array: [T], into size: Int) -> [[T]] {
+    stride(from: 0, to: array.count, by: size).map {
+        Array(array[$0..<min($0 + size, array.count)])
     }
 }
 
