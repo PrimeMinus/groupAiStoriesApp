@@ -24,6 +24,7 @@ struct NewHostView: View {
                     appData.currentStory.instructions = ""
                     appData.currentStory.players = []
                     appData.currentStory.content = []
+                    uploadNewStory(story: appData.currentStory)
                 })
                 StoryButtonView(title: "Cooking Compitition", setting: "MasterChef", theme: "Gordan Ramsay", instructions: "Eliminate players in cooking competitions", buttonAction: {
                     path.append("edit")

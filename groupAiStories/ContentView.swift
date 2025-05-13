@@ -24,7 +24,7 @@ struct ContentView: View {
                 }
             }
         // if user is in a story
-        } else if appData.currentStory.id != "" || true {
+        } else if appData.currentStory.id != "" {
             // if story has content
             if appData.currentStory.content.count > 0 {
                 if appData.currentStory.content[0] == "loading" {
