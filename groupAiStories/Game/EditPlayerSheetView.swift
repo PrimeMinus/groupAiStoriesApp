@@ -32,10 +32,10 @@ struct EditPlayerSheetView: View {
                     Text("Characteristics")
                 })
                 
-                Picker("Gender", selection: $player.characteristics) {
-                    Text("Male").tag("Apple")
-                    Text("Female").tag("Banana")
-                }
+//                Picker("Gender", selection: $player.characteristics) {
+//                    Text("Male").tag("Apple")
+//                    Text("Female").tag("Banana")
+//                }
                 
                 Section(content: {
                     Button(editingPlayerIndex != -1 ? "Edit Player" : "Add Player") {
@@ -54,6 +54,11 @@ struct EditPlayerSheetView: View {
             }
             .navigationTitle(editingPlayerIndex != -1 ? "Edit Player" : "Add Player")
                 .navigationBarTitleDisplayMode(.inline)
+                .task {
+                    if appData.currentStory.players.contains(player) {
+                        editingPlayerIndex = appData.currentStory.players.firstIndex(of: player)!
+                    }
+                }
             //MARK: - TOOLBAR
                 .toolbar(content: {
                     // KICK PLAYER BUTTON

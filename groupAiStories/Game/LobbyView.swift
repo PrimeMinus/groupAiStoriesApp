@@ -92,6 +92,11 @@ struct LobbyView: View {
                         .task {
                             editingPlayer = appData.currentStory.players.first ?? Player(id: "", name: "", characteristics: "")
                         }
+                        HStack {
+                            Text("Join Code:")
+                            Text(appData.currentStory.id)
+                                .bold()
+                        }
                         //MARK: - player list
                         LazyVStack(alignment: .leading) {
                             ForEach(chunked(appData.currentStory.players, into: 2), id: \.self) { pair in
@@ -139,7 +144,7 @@ struct LobbyView: View {
                     Spacer()
                 }
                 .onAppear {
-                    timerSubscription = Timer.publish(every: 5, on: .main, in: .common)
+                    timerSubscription = Timer.publish(every: 1, on: .main, in: .common)
                         .autoconnect()
                         .sink { _ in
                             fetchStory(id: appData.currentStory.id) { story in
@@ -160,35 +165,37 @@ struct LobbyView: View {
                     timerSubscription = nil
                 }
             } // End of scroll view
-            Button(action: {
-                if appData.currentStory.players.count > 1 {
-                    generateStory(id: appData.currentStory.id)
-                    appData.currentStory.content = []
-                    appData.currentStory.content.append("loading")
-                }
-            }, label: {
-                HStack {
-                    HStack {
-                        Spacer()
-                        Text("Generate")
-                            .frame(height: 50)
-                            .bold()
-                        Spacer()
+            if appData.isHost {
+                Button(action: {
+                    if appData.currentStory.players.count > 1 {
+                        generateStory(id: appData.currentStory.id)
+                        appData.currentStory.content = []
+                        appData.currentStory.content.append("loading")
                     }
-                    .background(appData.currentStory.players.count > 1  ? Color.teal : Color.gray)
-                    .clipShape(
-                        .rect(
-                            topLeadingRadius: 25,
-                            bottomLeadingRadius: 25,
-                            bottomTrailingRadius: 25,
-                            topTrailingRadius: 25
+                }, label: {
+                    HStack {
+                        HStack {
+                            Spacer()
+                            Text("Generate")
+                                .frame(height: 50)
+                                .bold()
+                            Spacer()
+                        }
+                        .background(appData.currentStory.players.count > 1  ? Color.teal : Color.gray)
+                        .clipShape(
+                            .rect(
+                                topLeadingRadius: 25,
+                                bottomLeadingRadius: 25,
+                                bottomTrailingRadius: 25,
+                                topTrailingRadius: 25
+                            )
                         )
-                    )
-                }
-                .foregroundStyle(Color.white)
-                .padding(.leading, 50)
-                .padding(.trailing, 50)
-            })
+                    }
+                    .foregroundStyle(Color.white)
+                    .padding(.leading, 50)
+                    .padding(.trailing, 50)
+                })
+            }
         }
     }
 }

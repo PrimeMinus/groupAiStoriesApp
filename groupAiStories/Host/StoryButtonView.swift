@@ -49,8 +49,6 @@ struct StoryButtonView: View {
                 )
             }
             .foregroundStyle(Color.white)
-            .padding(.leading, 50)
-            .padding(.trailing, 50)
         })
     }
 }

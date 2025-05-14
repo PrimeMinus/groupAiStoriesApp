@@ -13,6 +13,26 @@ struct storyContentView: View {
     
     @State private var slide = 0
     
+    @AppStorage("gameIdHistory") var gameIdHistoryJSON: String = "[\"ex1\", \"ex2\"]"
+    // Helper to decode stored array
+    private var gameIdHistory: [String] {
+        get {
+            if let data = gameIdHistoryJSON.data(using: .utf8),
+               let array = try? JSONDecoder().decode([String].self, from: data) {
+                return array
+            }
+            return []
+        }
+    }
+
+    // Helper to update stored array
+    private func updateSavedArray(_ newArray: [String]) {
+        if let data = try? JSONEncoder().encode(newArray),
+           let jsonString = String(data: data, encoding: .utf8) {
+            gameIdHistoryJSON = jsonString
+        }
+    }
+    
     var body: some View {
         ZStack {
             //Backdrop
@@ -38,6 +58,7 @@ struct storyContentView: View {
                     .bold()
                     .multilineTextAlignment(.leading)
                     .frame(width: UIScreen.main.bounds.width * 0.90)
+                    .foregroundStyle(Color.black)
                 Spacer()
                 if slide == appData.currentStory.content.count - 1 {
                     Button(action: {
@@ -90,6 +111,15 @@ struct storyContentView: View {
                         .frame(width: UIScreen.main.bounds.width * 0.6 )
 //                        .background(Color.blue)
                 })
+            }
+        }
+        .task {
+            // add this story to history
+            // Update the @AppStorage property with the new array
+            if !gameIdHistory.contains(appData.currentStory.id)  {
+                var newArray = gameIdHistory
+                newArray.append(appData.currentStory.id)
+                updateSavedArray(newArray)
             }
         }
     }
