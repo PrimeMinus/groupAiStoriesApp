@@ -15,6 +15,7 @@ struct LobbyView: View {
     
     @State private var editingPlayer = Player(id: "", name: "", characteristics: "")
     @State private var showEditPlayerSheet = false
+    @State private var showEditStorySheet = false
     
     var body: some View {
         VStack {
@@ -24,6 +25,17 @@ struct LobbyView: View {
                         Text(appData.currentStory.title)
                             .bold()
                             .font(.title)
+                        Button(action: {
+                            showEditStorySheet.toggle()
+                        }, label: {
+                            Image(systemName: "pencil")
+                            Text("Edit")
+                        })
+                        .sheet(isPresented: $showEditStorySheet, content: {
+                            EditStorySheetView(exitFunction: {
+                                showEditStorySheet.toggle()
+                            })
+                        })
                         HStack {
                             Image(systemName: "crown.fill")
                                 .foregroundStyle(Color.yellow)
@@ -99,7 +111,7 @@ struct LobbyView: View {
                                                     Spacer()
                                                     VStack {
                                                         Spacer()
-                                                        Image(systemName: "pencil.circle")
+                                                        Image(systemName: "pencil")
                                                         Spacer()
                                                     }
                                                     .padding(.trailing, 5)
@@ -150,7 +162,9 @@ struct LobbyView: View {
             } // End of scroll view
             Button(action: {
                 if appData.currentStory.players.count > 1 {
-                    print(true)
+                    generateStory(id: appData.currentStory.id)
+                    appData.currentStory.content = []
+                    appData.currentStory.content.append("loading")
                 }
             }, label: {
                 HStack {

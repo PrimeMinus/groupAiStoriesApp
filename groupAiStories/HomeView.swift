@@ -32,10 +32,10 @@ struct HomeView: View {
                     NewHostView(path: $path)
                 }
                 if value == "join" {
-                    JoinView()
+                    JoinLobbyView()
                 }
                 if value == "history" {
-                    LobbyView()
+                    HistoryView()
                 }
                 if value == "edit" {
                     EditNewStoryView()

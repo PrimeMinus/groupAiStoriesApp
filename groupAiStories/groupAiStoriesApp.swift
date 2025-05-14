@@ -8,7 +8,7 @@
 import SwiftUI
 
 class AppData: ObservableObject {
-    @Published var currentStory: Story = Story(id: "", title: "", setting: "", theme: "", instructions: "", winners: 0, winningPlayers: [], players: [], content: [])
+    @Published var currentStory: Story = Story(id: "", title: "", setting: "", theme: "", instructions: "", winners: 1, winningPlayers: [], players: [], content: [])
     @Published var isHost: Bool = false
 }
 

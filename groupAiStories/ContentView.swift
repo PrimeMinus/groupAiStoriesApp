@@ -28,7 +28,9 @@ struct ContentView: View {
             // if story has content
             if appData.currentStory.content.count > 0 {
                 if appData.currentStory.content[0] == "loading" {
-                    
+                    LoadingStoryView()
+                } else {
+                    storyContentView()
                 }
             } else {
                 LobbyView()

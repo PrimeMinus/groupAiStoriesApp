@@ -1,5 +1,5 @@
 //
-//  EditPlayerSheetView.swift
+//  EditStorySheetView.swift
 //  groupAiStories
 //
 //  Created by Brian Warner on 5/12/25.
@@ -7,10 +7,7 @@
 
 import SwiftUI
 
-struct EditPlayerSheetView: View {
-    
-    @State var player: Player
-    @State private var editingPlayerIndex: Int = -1
+struct EditStorySheetView: View {
     
     @State var exitFunction: () -> Void
     
@@ -18,58 +15,59 @@ struct EditPlayerSheetView: View {
     
     @FocusState private var isTyping: Bool
     
+    @State private var story = Story(id: "0000", title: "", setting: "", theme: "", instructions: "", winners: 1, winningPlayers: [], players: [], content: [])
+    
     var body: some View {
         NavigationStack {
             Form {
                 Section(content: {
-                    TextField("Name", text: $player.name)
+                    TextField("Title", text: $story.title)
                 }, header: {
-                    Text("Name")
+                    Text("Title")
                 })
                 Section(content: {
-                    TextField("Characteristics", text: $player.characteristics)
+                    TextField("Setting", text: $story.setting)
                 }, header: {
-                    Text("Characteristics")
+                    Text("Setting")
+                })
+                Section(content: {
+                    TextField("Theme", text: $story.theme)
+                }, header: {
+                    Text("Theme")
+                })
+                Section(content: {
+                    TextEditor(text: $story.instructions)
+                        .frame(minHeight: 45)
+                }, header: {
+                    Text("Instructions")
                 })
                 
-                Picker("Gender", selection: $player.characteristics) {
-                    Text("Male").tag("Apple")
-                    Text("Female").tag("Banana")
-                }
                 
                 Section(content: {
-                    Button(editingPlayerIndex != -1 ? "Edit Player" : "Add Player") {
-                        if player.name == "" {
+                    if $story.players.count > 1 {
+                        Stepper("Winners: \(story.winners)", value: $story.winners, in: 1...appData.currentStory.players.count - 1)
+                    } else {
+                        Stepper("Winners: -", value: $story.winners, in: 0...1)
+                            .disabled(true)
+                    }
+                })
+                
+                Section(content: {
+                    Button("Save Changes") {
+                        if story.title == "" {
                             return
                         }
-                        editPlayer(storyId: appData.currentStory.id, player: player)
-                        if editingPlayerIndex != -1 {
-                            appData.currentStory.players[editingPlayerIndex] = player
-                        } else {
-                            appData.currentStory.players.append(player)
-                        }
+                        story.players = appData.currentStory.players
+                        appData.currentStory = story
+                        editStory(story: appData.currentStory)
                         exitFunction()
                     }
                 })
             }
-            .navigationTitle(editingPlayerIndex != -1 ? "Edit Player" : "Add Player")
+            .navigationTitle("Edit Story")
                 .navigationBarTitleDisplayMode(.inline)
             //MARK: - TOOLBAR
                 .toolbar(content: {
-                    // KICK PLAYER BUTTON
-                    if editingPlayerIndex != -1 {
-                        ToolbarItem(placement: .topBarLeading) {
-                            Button(action: {
-                                player.name = ""
-                                editPlayer(storyId: appData.currentStory.id, player: player)
-                                appData.currentStory.players.remove(at: editingPlayerIndex)
-                                exitFunction()
-                            }, label: {
-                                Text("Kick")
-                                    .foregroundStyle(Color.red)
-                            })
-                        }
-                    }
                     // CANCEL BUTTON
                     ToolbarItem(placement: .topBarTrailing) {
                         Button(action: {
@@ -79,6 +77,9 @@ struct EditPlayerSheetView: View {
                         })
                     }
                 })
+        }
+        .task {
+            story = appData.currentStory
         }
     }
 }
@@ -105,6 +106,6 @@ struct EditPlayerSheetView: View {
     mockAppData.currentStory = previewStory
     mockAppData.isHost = true
 
-    return EditPlayerSheetView(player: Player(id: "1234", name: "Bryson", characteristics: "smart"), exitFunction: {print("exit")})
+    return EditStorySheetView(exitFunction: {print("exit")})
         .environmentObject(mockAppData)
 }
