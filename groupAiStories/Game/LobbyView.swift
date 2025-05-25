@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import CryptoKit
 
 struct LobbyView: View {
     
@@ -99,44 +100,42 @@ struct LobbyView: View {
                         }
                         //MARK: - player list
                         LazyVStack(alignment: .leading) {
-                            ForEach(chunked(appData.currentStory.players, into: 2), id: \.self) { pair in
-                                HStack {
-                                    ForEach(pair) { player in
-                                        Button(action: {
-                                            editingPlayer = player
-                                            showEditPlayerSheet.toggle()
-                                        }, label: {
-                                            VStack {
-                                                HStack {
-                                                    VStack {
-                                                        Text(player.name)
-                                                        Text(player.characteristics)
-                                                    }
-                                                    .padding(.leading, 5)
-                                                    Spacer()
-                                                    VStack {
-                                                        Spacer()
-                                                        Image(systemName: "pencil")
-                                                        Spacer()
-                                                    }
-                                                    .padding(.trailing, 5)
-                                                }
-                                                .background(Color.accentColor)
-                                                .clipShape(
-                                                    .rect(
-                                                        topLeadingRadius: 15,
-                                                        bottomLeadingRadius: 15,
-                                                        bottomTrailingRadius: 15,
-                                                        topTrailingRadius: 15
-                                                    )
-                                                )
+                            ForEach(appData.currentStory.players, id: \.self) { player in
+                                Button(action: {
+                                    editingPlayer = player
+                                    showEditPlayerSheet.toggle()
+                                }, label: {
+                                    VStack {
+                                        HStack {
+                                            VStack (alignment: .leading) {
+                                                Text(player.name)
+                                                    .bold()
+                                                    .font(.title3)
+                                                Text(player.characteristics)
                                             }
-                                            .foregroundStyle(Color.white)
-                                            .padding(.leading, 5)
+                                            .multilineTextAlignment(.leading)
+                                            .padding(10)
+                                            Spacer()
+                                            VStack {
+                                                Spacer()
+                                                Image(systemName: "pencil")
+                                                Spacer()
+                                            }
                                             .padding(.trailing, 5)
-                                        })
+                                        }
+                                        .background(Color.fromString(player.id))
+                                        .clipShape(
+                                            .rect(
+                                                topLeadingRadius: 15,
+                                                bottomLeadingRadius: 15,
+                                                bottomTrailingRadius: 15,
+                                                topTrailingRadius: 15
+                                            )
+                                        )
                                     }
-                                }
+                                    .foregroundStyle(Color.white)
+                                    .padding(.bottom, 5)
+                                })
                             }
                         }
                     }
@@ -204,6 +203,24 @@ struct LobbyView: View {
 func chunked<T>(_ array: [T], into size: Int) -> [[T]] {
     stride(from: 0, to: array.count, by: size).map {
         Array(array[$0..<min($0 + size, array.count)])
+    }
+}
+
+extension Color {
+    static func fromString(_ input: String) -> Color {
+        // Hash the string using SHA256 for better distribution
+        let hash = SHA256.hash(data: Data(input.utf8))
+        
+        // Use the first few bytes of the hash to generate a hue
+        let hashValue = hash.withUnsafeBytes { ptr in
+            ptr.load(as: UInt64.self)
+        }
+        
+        // Normalize to a hue (0.0 - 1.0)
+        let hue = Double(hashValue % 360) / 360.0
+        
+        // Fixed saturation and brightness for nice color variety
+        return Color(hue: hue, saturation: 0.6, brightness: 0.7)
     }
 }
 

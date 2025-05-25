@@ -30,7 +30,7 @@ struct ContentView: View {
                 if appData.currentStory.content[0] == "loading" {
                     LoadingStoryView()
                 } else {
-                    storyContentView()
+                    StoryContentView()
                 }
             } else {
                 LobbyView()

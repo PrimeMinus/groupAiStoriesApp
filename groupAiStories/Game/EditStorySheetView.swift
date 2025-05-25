@@ -11,6 +11,10 @@ struct EditStorySheetView: View {
     
     @State var exitFunction: () -> Void
     
+    @State private var showInspectSheet = false
+    
+    @AppStorage("developerMode") var developerMode: Bool = false
+    
     @EnvironmentObject var appData: AppData
     
     @FocusState private var isTyping: Bool
@@ -37,7 +41,6 @@ struct EditStorySheetView: View {
                 })
                 Section(content: {
                     TextEditor(text: $story.instructions)
-                        .frame(minHeight: 45)
                 }, header: {
                     Text("Instructions")
                 })
@@ -47,34 +50,48 @@ struct EditStorySheetView: View {
                     if $story.players.count > 1 {
                         Stepper("Winners: \(story.winners)", value: $story.winners, in: 1...appData.currentStory.players.count - 1)
                     } else {
-                        Stepper("Winners: -", value: $story.winners, in: 0...1)
+                        Stepper("Winners: -", value: .constant(0), in: 0...0)
                             .disabled(true)
                     }
                 })
                 
-                Section(content: {
-                    Button("Save Changes") {
-                        if story.title == "" {
-                            return
-                        }
-                        story.players = appData.currentStory.players
-                        appData.currentStory = story
-                        editStory(story: appData.currentStory)
-                        exitFunction()
-                    }
-                })
+                if developerMode {
+                    Section(content: {
+                        Button("Inspect Story", role: .none, action: {
+                            showInspectSheet.toggle()
+                        })
+                    })
+                }
+                
             }
             .navigationTitle("Edit Story")
                 .navigationBarTitleDisplayMode(.inline)
+                .sheet(isPresented: $showInspectSheet, content: {
+                    StoryInspectView()
+                })
             //MARK: - TOOLBAR
                 .toolbar(content: {
                     // CANCEL BUTTON
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button(action: {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button("Cancel", role: .cancel, action: {
                             exitFunction()
-                        }, label: {
-                            Text("Cancel")
                         })
+                    }
+                    // SAVE BUTTON
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Save", role: .none, action: {
+                            if story.title == "" {
+                                return
+                            }
+                            if (story.players.count <= 2) {
+                                story.winners = 1
+                            }
+                            story.players = appData.currentStory.players
+                            appData.currentStory = story
+                            editStory(story: appData.currentStory)
+                            exitFunction()
+                        })
+                        .bold()
                     }
                 })
         }

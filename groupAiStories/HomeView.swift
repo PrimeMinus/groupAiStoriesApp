@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeView: View {
     
     @State private var path = NavigationPath()
+    @State private var showSettingsSheet = false
     @EnvironmentObject var appData: AppData
     
     var body: some View {
@@ -26,6 +27,20 @@ struct HomeView: View {
                     path.append("history")
                 })
             }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        showSettingsSheet.toggle()
+                    }) {
+                        Image(systemName: "gearshape.fill")
+                    }
+                }
+            }
+            .sheet(isPresented: $showSettingsSheet, content: {
+                SettingsView(exitFunction: {
+                    showSettingsSheet.toggle()
+                })
+            })
             .navigationTitle(Text("Home"))
             .navigationDestination(for: String.self) { value in
                 if value == "host" {

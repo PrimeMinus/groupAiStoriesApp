@@ -11,6 +11,7 @@ struct EditPlayerSheetView: View {
     
     @State var player: Player
     @State private var editingPlayerIndex: Int = -1
+    @State private var showKickAlert = false
     
     @State var exitFunction: () -> Void
     
@@ -27,7 +28,7 @@ struct EditPlayerSheetView: View {
                     Text("Name")
                 })
                 Section(content: {
-                    TextField("Characteristics", text: $player.characteristics)
+                    TextEditor(text: $player.characteristics)
                 }, header: {
                     Text("Characteristics")
                 })
@@ -37,20 +38,6 @@ struct EditPlayerSheetView: View {
 //                    Text("Female").tag("Banana")
 //                }
                 
-                Section(content: {
-                    Button(editingPlayerIndex != -1 ? "Edit Player" : "Add Player") {
-                        if player.name == "" {
-                            return
-                        }
-                        editPlayer(storyId: appData.currentStory.id, player: player)
-                        if editingPlayerIndex != -1 {
-                            appData.currentStory.players[editingPlayerIndex] = player
-                        } else {
-                            appData.currentStory.players.append(player)
-                        }
-                        exitFunction()
-                    }
-                })
             }
             .navigationTitle(editingPlayerIndex != -1 ? "Edit Player" : "Add Player")
                 .navigationBarTitleDisplayMode(.inline)
@@ -61,28 +48,51 @@ struct EditPlayerSheetView: View {
                 }
             //MARK: - TOOLBAR
                 .toolbar(content: {
-                    // KICK PLAYER BUTTON
-                    if editingPlayerIndex != -1 {
-                        ToolbarItem(placement: .topBarLeading) {
-                            Button(action: {
-                                player.name = ""
-                                editPlayer(storyId: appData.currentStory.id, player: player)
-                                appData.currentStory.players.remove(at: editingPlayerIndex)
-                                exitFunction()
-                            }, label: {
-                                Text("Kick")
-                                    .foregroundStyle(Color.red)
-                            })
-                        }
-                    }
                     // CANCEL BUTTON
-                    ToolbarItem(placement: .topBarTrailing) {
+                    ToolbarItem(placement: .topBarLeading) {
                         Button(action: {
                             exitFunction()
                         }, label: {
                             Text("Cancel")
                         })
                     }
+                    // KICK PLAYER BUTTON
+                    if editingPlayerIndex != -1 {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button(action: {
+                                showKickAlert.toggle()
+                            }, label: {
+                                Text("Kick")
+                                    .foregroundStyle(Color.red)
+                            })
+                        }
+                    }
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button(editingPlayerIndex != -1 ? "Save" : "Add") {
+                            if player.name == "" {
+                                return
+                            }
+                            editPlayer(storyId: appData.currentStory.id, player: player)
+                            if editingPlayerIndex != -1 {
+                                appData.currentStory.players[editingPlayerIndex] = player
+                            } else {
+                                appData.currentStory.players.append(player)
+                            }
+                            exitFunction()
+                        }
+                        .bold()
+                    }
+                })
+                .alert("Remove \"\(player.name)\" from the game?", isPresented: $showKickAlert, actions: {
+                    Button("Cancel", role: .cancel, action: {
+                        showKickAlert.toggle()
+                    })
+                    Button("Kick", role: .destructive, action: {
+                            player.name = ""
+                            editPlayer(storyId: appData.currentStory.id, player: player)
+                            appData.currentStory.players.remove(at: editingPlayerIndex)
+                            exitFunction()
+                    })
                 })
         }
     }
